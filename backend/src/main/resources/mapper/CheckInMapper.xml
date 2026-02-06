@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hotel.mapper.CheckInMapper">
+
+    <resultMap id="CheckInResultMap" type="com.hotel.entity.CheckIn">
+        <id property="id" column="id"/>
+        <result property="checkInNo" column="check_in_no"/>
+        <result property="reservationId" column="reservation_id"/>
+        <result property="customerId" column="customer_id"/>
+        <result property="roomId" column="room_id"/>
+        <result property="checkInTime" column="check_in_time"/>
+        <result property="checkOutTime" column="check_out_time"/>
+        <result property="expectedCheckOut" column="expected_check_out"/>
+        <result property="nights" column="nights"/>
+        <result property="roomPrice" column="room_price"/>
+        <result property="totalPrice" column="total_price"/>
+        <result property="deposit" column="deposit"/>
+        <result property="extraCharges" column="extra_charges"/>
+        <result property="discount" column="discount"/>
+        <result property="actualAmount" column="actual_amount"/>
+        <result property="paidAmount" column="paid_amount"/>
+        <result property="status" column="status"/>
+        <result property="remark" column="remark"/>
+        <result property="operatorId" column="operator_id"/>
+        <result property="deleted" column="deleted"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <association property="customer" javaType="com.hotel.entity.Customer">
+            <id property="id" column="c_id"/>
+            <result property="name" column="c_name"/>
+            <result property="phone" column="c_phone"/>
+            <result property="idCard" column="c_id_card"/>
+        </association>
+        <association property="room" javaType="com.hotel.entity.Room">
+            <id property="id" column="r_id"/>
+            <result property="roomNumber" column="room_number"/>
+            <result property="floor" column="floor"/>
+            <result property="roomTypeId" column="room_type_id"/>
+        </association>
+    </resultMap>
+
+    <select id="selectCheckInPage" resultMap="CheckInResultMap">
+        SELECT ci.*,
+               c.id as c_id, c.name as c_name, c.phone as c_phone, c.id_card as c_id_card,
+               r.id as r_id, r.room_number, r.floor, r.room_type_id
+        FROM check_in ci
+        LEFT JOIN customer c ON ci.customer_id = c.id
+        LEFT JOIN room r ON ci.room_id = r.id
+        WHERE ci.deleted = 0
+        <if test="checkInNo != null and checkInNo != ''">
+            AND ci.check_in_no LIKE CONCAT('%', #{checkInNo}, '%')
+        </if>
+        <if test="customerName != null and customerName != ''">
+            AND c.name LIKE CONCAT('%', #{customerName}, '%')
+        </if>
+        <if test="roomNumber != null and roomNumber != ''">
+            AND r.room_number LIKE CONCAT('%', #{roomNumber}, '%')
+        </if>
+        <if test="status != null">
+            AND ci.status = #{status}
+        </if>
+        <if test="startDate != null">
+            AND DATE(ci.check_in_time) >= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND DATE(ci.check_in_time) &lt;= #{endDate}
+        </if>
+        ORDER BY ci.create_time DESC
+    </select>
+
+    <select id="selectCheckInById" resultMap="CheckInResultMap">
+        SELECT ci.*,
+               c.id as c_id, c.name as c_name, c.phone as c_phone, c.id_card as c_id_card,
+               r.id as r_id, r.room_number, r.floor, r.room_type_id
+        FROM check_in ci
+        LEFT JOIN customer c ON ci.customer_id = c.id
+        LEFT JOIN room r ON ci.room_id = r.id
+        WHERE ci.id = #{id} AND ci.deleted = 0
+    </select>
+
+</mapper>

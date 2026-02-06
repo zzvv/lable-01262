@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hotel.mapper.BillMapper">
+
+    <resultMap id="BillResultMap" type="com.hotel.entity.Bill">
+        <id property="id" column="id"/>
+        <result property="billNo" column="bill_no"/>
+        <result property="checkInId" column="check_in_id"/>
+        <result property="customerId" column="customer_id"/>
+        <result property="billType" column="bill_type"/>
+        <result property="itemName" column="item_name"/>
+        <result property="amount" column="amount"/>
+        <result property="paymentMethod" column="payment_method"/>
+        <result property="paymentStatus" column="payment_status"/>
+        <result property="paymentTime" column="payment_time"/>
+        <result property="remark" column="remark"/>
+        <result property="operatorId" column="operator_id"/>
+        <result property="deleted" column="deleted"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <association property="customer" javaType="com.hotel.entity.Customer">
+            <id property="id" column="c_id"/>
+            <result property="name" column="c_name"/>
+            <result property="phone" column="c_phone"/>
+        </association>
+    </resultMap>
+
+    <resultMap id="BillExportResultMap" type="com.hotel.entity.Bill">
+        <id property="id" column="id"/>
+        <result property="billNo" column="bill_no"/>
+        <result property="checkInId" column="check_in_id"/>
+        <result property="customerId" column="customer_id"/>
+        <result property="billType" column="bill_type"/>
+        <result property="itemName" column="item_name"/>
+        <result property="amount" column="amount"/>
+        <result property="paymentMethod" column="payment_method"/>
+        <result property="paymentStatus" column="payment_status"/>
+        <result property="paymentTime" column="payment_time"/>
+        <result property="remark" column="remark"/>
+        <result property="createTime" column="create_time"/>
+        <association property="customer" javaType="com.hotel.entity.Customer">
+            <id property="id" column="c_id"/>
+            <result property="name" column="c_name"/>
+        </association>
+        <association property="checkIn" javaType="com.hotel.entity.CheckIn">
+            <id property="id" column="ci_id"/>
+            <association property="room" javaType="com.hotel.entity.Room">
+                <result property="roomNumber" column="room_number"/>
+            </association>
+        </association>
+    </resultMap>
+
+    <select id="selectBillPage" resultMap="BillResultMap">
+        SELECT b.*,
+               c.id as c_id, c.name as c_name, c.phone as c_phone
+        FROM bill b
+        LEFT JOIN customer c ON b.customer_id = c.id
+        WHERE b.deleted = 0
+        <if test="billNo != null and billNo != ''">
+            AND b.bill_no LIKE CONCAT('%', #{billNo}, '%')
+        </if>
+        <if test="customerName != null and customerName != ''">
+            AND c.name LIKE CONCAT('%', #{customerName}, '%')
+        </if>
+        <if test="billType != null">
+            AND b.bill_type = #{billType}
+        </if>
+        <if test="paymentStatus != null">
+            AND b.payment_status = #{paymentStatus}
+        </if>
+        <if test="startDate != null">
+            AND DATE(b.create_time) >= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND DATE(b.create_time) &lt;= #{endDate}
+        </if>
+        ORDER BY b.create_time DESC
+    </select>
+
+    <select id="selectBillList" resultMap="BillExportResultMap">
+        SELECT b.*,
+               c.id as c_id, c.name as c_name,
+               ci.id as ci_id, r.room_number
+        FROM bill b
+        LEFT JOIN customer c ON b.customer_id = c.id
+        LEFT JOIN check_in ci ON b.check_in_id = ci.id
+        LEFT JOIN room r ON ci.room_id = r.id
+        WHERE b.deleted = 0
+        <if test="billNo != null and billNo != ''">
+            AND b.bill_no LIKE CONCAT('%', #{billNo}, '%')
+        </if>
+        <if test="customerName != null and customerName != ''">
+            AND c.name LIKE CONCAT('%', #{customerName}, '%')
+        </if>
+        <if test="billType != null">
+            AND b.bill_type = #{billType}
+        </if>
+        <if test="paymentStatus != null">
+            AND b.payment_status = #{paymentStatus}
+        </if>
+        <if test="startDate != null">
+            AND DATE(b.create_time) >= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND DATE(b.create_time) &lt;= #{endDate}
+        </if>
+        ORDER BY b.create_time DESC
+    </select>
+
+</mapper>
