@@ -106,7 +106,13 @@ const handleRoomClick = (room) => {
 
 const goCheckIn = () => {
   detailVisible.value = false
-  router.push({ path: '/checkin/create', query: { roomId: currentRoom.value.id } })
+  router.push({ 
+    path: '/checkin/create', 
+    query: { 
+      roomId: currentRoom.value.id,
+      roomTypeId: currentRoom.value.roomTypeId
+    } 
+  })
 }
 
 const setFree = async () => {

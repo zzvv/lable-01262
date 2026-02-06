@@ -18,61 +18,68 @@
           router
           @select="handleMenuSelect"
         >
+          <!-- 首页 - 所有人可见 -->
           <el-menu-item index="/dashboard">
             <el-icon><House /></el-icon>
             <span>首页</span>
           </el-menu-item>
           
-          <el-sub-menu index="room">
+          <!-- 房间管理 -->
+          <el-sub-menu index="room" v-if="hasPermission('room')">
             <template #title>
               <el-icon><OfficeBuilding /></el-icon>
               <span>房间管理</span>
             </template>
-            <el-menu-item index="/room/type">房型管理</el-menu-item>
-            <el-menu-item index="/room/list">房间列表</el-menu-item>
-            <el-menu-item index="/room/status">房态总览</el-menu-item>
+            <el-menu-item index="/room/type" v-if="hasPermission('room:type')">房型管理</el-menu-item>
+            <el-menu-item index="/room/list" v-if="hasPermission('room:list')">房间列表</el-menu-item>
+            <el-menu-item index="/room/status" v-if="hasPermission('room:status')">房态总览</el-menu-item>
           </el-sub-menu>
           
-          <el-sub-menu index="reservation">
+          <!-- 预订管理 -->
+          <el-sub-menu index="reservation" v-if="hasPermission('reservation')">
             <template #title>
               <el-icon><Calendar /></el-icon>
               <span>预订管理</span>
             </template>
-            <el-menu-item index="/reservation/list">预订列表</el-menu-item>
-            <el-menu-item index="/reservation/create">新建预订</el-menu-item>
+            <el-menu-item index="/reservation/list" v-if="hasPermission('reservation:list')">预订列表</el-menu-item>
+            <el-menu-item index="/reservation/create" v-if="hasPermission('reservation:create')">新建预订</el-menu-item>
           </el-sub-menu>
           
-          <el-sub-menu index="checkin">
+          <!-- 入住管理 -->
+          <el-sub-menu index="checkin" v-if="hasPermission('checkin')">
             <template #title>
               <el-icon><Key /></el-icon>
               <span>入住管理</span>
             </template>
-            <el-menu-item index="/checkin/list">入住列表</el-menu-item>
-            <el-menu-item index="/checkin/create">办理入住</el-menu-item>
+            <el-menu-item index="/checkin/list" v-if="hasPermission('checkin:list')">入住列表</el-menu-item>
+            <el-menu-item index="/checkin/create" v-if="hasPermission('checkin:create')">办理入住</el-menu-item>
           </el-sub-menu>
           
-          <el-menu-item index="/customer/list">
+          <!-- 客户管理 -->
+          <el-menu-item index="/customer/list" v-if="hasPermission('customer')">
             <el-icon><User /></el-icon>
             <span>客户管理</span>
           </el-menu-item>
           
-          <el-sub-menu index="finance">
+          <!-- 财务管理 -->
+          <el-sub-menu index="finance" v-if="hasPermission('finance')">
             <template #title>
               <el-icon><Money /></el-icon>
               <span>财务管理</span>
             </template>
-            <el-menu-item index="/finance/bill">账单管理</el-menu-item>
-            <el-menu-item index="/finance/report">统计报表</el-menu-item>
+            <el-menu-item index="/finance/bill" v-if="hasPermission('finance:bill')">账单管理</el-menu-item>
+            <el-menu-item index="/finance/report" v-if="hasPermission('finance:report')">统计报表</el-menu-item>
           </el-sub-menu>
           
-          <el-sub-menu index="system" v-if="userStore.isAdmin">
+          <!-- 系统管理 - 仅管理员可见 -->
+          <el-sub-menu index="system" v-if="hasPermission('system')">
             <template #title>
               <el-icon><Setting /></el-icon>
               <span>系统管理</span>
             </template>
-            <el-menu-item index="/system/user">用户管理</el-menu-item>
-            <el-menu-item index="/system/role">角色管理</el-menu-item>
-            <el-menu-item index="/system/menu">菜单管理</el-menu-item>
+            <el-menu-item index="/system/user" v-if="hasPermission('system:user')">用户管理</el-menu-item>
+            <el-menu-item index="/system/role" v-if="hasPermission('system:role')">角色管理</el-menu-item>
+            <el-menu-item index="/system/menu" v-if="hasPermission('system:menu')">菜单管理</el-menu-item>
           </el-sub-menu>
         </el-menu>
       </div>
@@ -94,7 +101,7 @@
           <el-dropdown @command="handleCommand">
             <span class="user-info">
               <el-avatar :size="32" icon="User" />
-              <span class="username">{{ userStore.nickname || userStore.username }}</span>
+              <span class="username">{{ nickname || username }}</span>
             </span>
             <template #dropdown>
               <el-dropdown-menu>
@@ -115,15 +122,36 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { useUserStore } from '@/store/user'
+import { useStore } from 'vuex'
 
 const route = useRoute()
-const userStore = useUserStore()
+const store = useStore()
 
 const isCollapsed = ref(false)
 const isMobile = ref(false)
 
+// 从Vuex获取状态
+const nickname = computed(() => store.state.nickname)
+const username = computed(() => store.state.username)
+const permissions = computed(() => store.state.permissions || [])
+const roles = computed(() => store.state.roles || [])
+
 const activeMenu = computed(() => route.path)
+
+/**
+ * 检查是否有权限
+ * @param {string} perm - 权限标识，如 'system' 或 'system:user'
+ */
+const hasPermission = (perm) => {
+  // 管理员拥有所有权限
+  if (permissions.value.includes('*:*:*') || roles.value.includes('admin')) {
+    return true
+  }
+  
+  // 检查是否有该模块的任意权限
+  // 例如：检查 'room' 时，如果有 'room:type:list' 也算有权限
+  return permissions.value.some(p => p.startsWith(perm))
+}
 
 const checkMobile = () => {
   isMobile.value = window.innerWidth < 768
@@ -145,7 +173,7 @@ const handleMenuSelect = () => {
 
 const handleCommand = (command) => {
   if (command === 'logout') {
-    userStore.logout()
+    store.dispatch('logout')
   }
 }
 

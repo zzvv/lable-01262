@@ -82,11 +82,11 @@
                 <el-table-column label="消费" width="100">
                   <template #default="{ row }">¥{{ row.consumeRevenue }}</template>
                 </el-table-column>
-                <el-table-column prop="checkInCount" label="入住数" width="80" />
-                <el-table-column prop="checkOutCount" label="退房数" width="80" />
-                <el-table-column prop="reservationCount" label="预订数" width="80" />
-                <el-table-column prop="newCustomerCount" label="新客户" width="80" />
-                <el-table-column label="入住率" width="80">
+                <el-table-column prop="checkInCount" label="入住数"   />
+                <el-table-column prop="checkOutCount" label="退房数"   />
+                <el-table-column prop="reservationCount" label="预订数"   />
+                <el-table-column prop="newCustomerCount" label="新客户"   />
+                <el-table-column label="入住率"  >
                   <template #default="{ row }">{{ row.occupancyRate }}%</template>
                 </el-table-column>
                 <el-table-column prop="createTime" label="生成时间" width="160" />
@@ -129,7 +129,7 @@
                 </el-table-column>
                 <el-table-column prop="checkInCount" label="入住总数" width="90" />
                 <el-table-column prop="checkOutCount" label="退房总数" width="90" />
-                <el-table-column prop="newCustomerCount" label="新客户" width="80" />
+                <el-table-column prop="newCustomerCount" label="新客户"   />
                 <el-table-column label="平均入住率" width="100">
                   <template #default="{ row }">{{ row.avgOccupancyRate }}%</template>
                 </el-table-column>

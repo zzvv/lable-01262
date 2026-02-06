@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
-import { useUserStore } from '@/store/user'
+import store from '@/store'  // Vuex store
 import router from '@/router'
 
 const request = axios.create({
@@ -11,9 +11,9 @@ const request = axios.create({
 // 请求拦截器
 request.interceptors.request.use(
   config => {
-    const userStore = useUserStore()
-    if (userStore.token) {
-      config.headers['Authorization'] = `Bearer ${userStore.token}`
+    const token = store.state.token
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`
     }
     return config
   },
@@ -36,8 +36,7 @@ request.interceptors.response.use(
       
       // 401 未授权
       if (res.code === 401) {
-        const userStore = useUserStore()
-        userStore.logout()
+        store.dispatch('logout')
         router.push('/login')
       }
       

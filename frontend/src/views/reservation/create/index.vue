@@ -11,7 +11,7 @@
         </el-col>
         <el-col :span="12">
           <el-form-item label="联系电话" prop="customer.phone">
-            <el-input v-model="form.customer.phone" @blur="searchCustomer" />
+            <el-input v-model="form.customer.phone" maxlength="11" show-word-limit placeholder="请输入11位手机号" @blur="searchCustomer" />
           </el-form-item>
         </el-col>
       </el-row>
@@ -19,7 +19,7 @@
       <el-row :gutter="20">
         <el-col :span="12">
           <el-form-item label="身份证号" prop="customer.idCard">
-            <el-input v-model="form.customer.idCard" />
+            <el-input v-model="form.customer.idCard" maxlength="18" show-word-limit placeholder="请输入18位身份证号" />
           </el-form-item>
         </el-col>
         <el-col :span="12">

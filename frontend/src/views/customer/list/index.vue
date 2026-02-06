@@ -43,11 +43,11 @@
           <el-tag :type="levelType[row.memberLevel]">{{ levelMap[row.memberLevel] }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="points" label="积分" width="80" />
+      <el-table-column prop="points" label="积分"  />
       <el-table-column label="累计消费" width="100">
         <template #default="{ row }">¥{{ row.totalConsumption }}</template>
       </el-table-column>
-      <el-table-column prop="visitCount" label="入住次数" width="80" />
+      <el-table-column prop="visitCount" label="入住次数"  />
       <el-table-column label="操作" width="150">
         <template #default="{ row }">
           <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
@@ -73,10 +73,10 @@
           <el-input v-model="form.name" />
         </el-form-item>
         <el-form-item label="手机号" prop="phone">
-          <el-input v-model="form.phone" />
+          <el-input v-model="form.phone" maxlength="11" placeholder="请输入11位手机号" />
         </el-form-item>
         <el-form-item label="身份证号" prop="idCard">
-          <el-input v-model="form.idCard" />
+          <el-input v-model="form.idCard" maxlength="18" placeholder="请输入18位身份证号" />
         </el-form-item>
         <el-form-item label="性别">
           <el-radio-group v-model="form.gender">
@@ -122,7 +122,13 @@ const form = reactive({ id: null, name: '', phone: '', idCard: '', gender: 1, em
 
 const rules = {
   name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
-  phone: [{ required: true, message: '请输入手机号', trigger: 'blur' }]
+  phone: [
+    { required: true, message: '请输入手机号', trigger: 'blur' },
+    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的11位手机号', trigger: 'blur' }
+  ],
+  idCard: [
+    { pattern: /^[1-9]\d{5}(18|19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}[\dXx]$/, message: '请输入正确的18位身份证号', trigger: 'blur' }
+  ]
 }
 
 const dialogTitle = computed(() => form.id ? '编辑客户' : '新增客户')
