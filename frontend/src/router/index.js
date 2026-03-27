@@ -12,6 +12,7 @@ const routePermissions = {
   '/checkin/create': 'checkin:create',
   '/customer/list': 'customer:list',
   '/finance/bill': 'finance:bill',
+  '/finance/consumption': 'finance:consumption',
   '/finance/report': 'finance:report',
   '/system/user': 'system:user',
   '/system/role': 'system:role',
@@ -113,6 +114,12 @@ const routes = [
         name: 'FinanceBill',
         component: () => import('@/views/finance/bill/index.vue'),
         meta: { title: '账单管理', permission: 'finance:bill' }
+      },
+      {
+        path: 'finance/consumption',
+        name: 'FinanceConsumption',
+        component: () => import('@/views/finance/consumption/index.vue'),
+        meta: { title: '消费记录', permission: 'finance:consumption' }
       },
       {
         path: 'finance/report',
