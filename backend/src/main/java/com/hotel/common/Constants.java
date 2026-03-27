@@ -56,6 +56,14 @@ public class Constants {
     }
 
     /**
+     * 消费记录状态
+     */
+    public static class ConsumptionStatus {
+        public static final int VALID = 0;       // 有效
+        public static final int CANCELLED = 1;   // 已作废
+    }
+
+    /**
      * Redis Key 前缀
      */
     public static class RedisKey {
